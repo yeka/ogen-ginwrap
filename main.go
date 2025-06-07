@@ -50,9 +50,8 @@ import (
 )
 
 // RegisterRoutes registers routes from OpenAPI spec into gin.Engine
-// basePath add base path to the gin router
-// stripPrefix remove base path before sending it to original ogen handler
-func RegisterRoutes(r *gin.Engine, ogenHandler http.Handler, basePath string, stripPrefix string) {
+// basePath add base path to the gin router. Your ogenHandler must also have prefix to match gin router.
+func RegisterRoutes(r *gin.Engine, ogenHandler http.Handler, basePath string) {
 	if basePath != "" {
 		if basePath[0] != '/' {
 			basePath = "/" + basePath
@@ -63,17 +62,9 @@ func RegisterRoutes(r *gin.Engine, ogenHandler http.Handler, basePath string, st
 {{- range .Routes }}
 	{{- $path := .GinPath }}
 	{{- range .Methods }}
-	r.{{ . }}(basePath + "{{ $path }}", wrapOgenHandler(ogenHandler, stripPrefix))
+	r.{{ . }}(basePath + "{{ $path }}", gin.WrapH(ogenHandler))
 	{{- end }}
 {{- end }}
-}
-
-func wrapOgenHandler(h http.Handler, prefix string) gin.HandlerFunc {
-	prefix = strings.TrimRight(prefix, "/")
-	handler := http.StripPrefix(prefix, h)
-	return func(c *gin.Context) {
-		handler.ServeHTTP(c.Writer, c.Request)
-	}
 }
 `
 

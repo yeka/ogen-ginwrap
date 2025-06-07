@@ -28,5 +28,14 @@ server := gen.NewServer(MyHandler{}) // generated strict interface
 
 r := gin.Default()
 r.Use(otelgin.Middleware("your-service"))
-ginwrap.RegisterRoutes(r, server, "", "")
+ginwrap.RegisterRoutes(r, server, "")
+```
+
+Adding prefix to ogen & gin:
+```go
+server := gen.NewServer(MyHandler{}, gen.WithPathPrefix("/v1")) // generated strict interface
+
+r := gin.Default()
+r.Use(otelgin.Middleware("your-service"))
+ginwrap.RegisterRoutes(r, server, "/v1")
 ```
